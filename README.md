@@ -16,12 +16,12 @@
 
 
 ## 목차
-
-
-
+* [06-19](#0619수)
+* [06-20](#0620목)
+* [06-21](#0621금)
 
 ---
-### 06-19(수)
+### 06.19(수)
 
 
 사용된 아두이노 차량 사진 프로젝트를 시행하기에 앞서 차량 조립을 진행하였다.
@@ -85,7 +85,7 @@ void loop() {
 우선은 이렇게 짜여진 코드를 이용해 모의주행을 실시하여 학습시킬 데이터를 수집할 것이다.
 
 
-
+### 06.20(목)
 # _1_myjoystick.py
 
 ```py
@@ -212,7 +212,19 @@ class MyJoystickApp:
     def run(self):
         self.app.exec_()
 ```
-# _3_.py
+여기까지 작성후 실행 시킨 모습이다.
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/a86f6513-3fb6-4f63-aa13-46f43c5b4fca" width="400" height="400">
+</div>
+
+카메라 연결을cv2 모델의 camMain 함수에서 처리하고 이전의 조이스틱 파일을 불러와 결합시켜 동작을 한다.
+
+---
+
+### 06-21(금)
+
+# _3_MyJoystickCamApp.py
 ```py
 class MyJoystickCamApp(MyJoystickApp):
     def __init__(self, cbJoyPos=None):
@@ -266,7 +278,7 @@ class MyJoystickCamApp(MyJoystickApp):
             print("FPS: %d, avg: %.2f" % (self.cnt_frame, self.total_frame / self.cnt_time))
             self.cnt_frame = 0
 ```
-# _4_.py
+# _4_MyDataCollectionApp.py
 ```py
 class MyDataCollectionApp(MyJoystickCamApp):
     def __init__(self, cbJoyPos=None):
@@ -354,7 +366,7 @@ if __name__ == '__main__':
     myDataCollectionApp.run()
 ```
 
-# _4-1_.py
+# _4-1_MyDataCollectionApp.py
 ```py
 class MyDataCollectionApp(MyJoystickCamApp):
     def __init__(self, cbJoyPos=None):
@@ -451,7 +463,7 @@ if __name__ == '__main__':
     myDataCollectionApp = MyDataCollectionApp(cbJoyPos=cbJoyPos)
     myDataCollectionApp.run()
 ```
-# _5_.py
+# _5_data_labelling.py
 ```py
 dataDir = 'data'  # 데이터 저장 디렉터리
 
@@ -475,7 +487,7 @@ for num, roadDir in enumerate(roadDirs):
 f_csv.flush()
 f_csv.close()
 ```
-# _6_.py
+# _6_cnn_training.py
 ```py
 dirname = "data"
 
@@ -509,7 +521,7 @@ print(tensors.shape)
 print(targets.shape)
 ```
 
-# _6-1_.py
+# _6-1_cnn_reading.py
 ```py
 # Name list
 names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
@@ -532,7 +544,7 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 plt.show()
 ```
-# _7_.py
+# _7_tensorflow_training.py
 ```py
 model1 = load_model('model.h5')
 
@@ -557,7 +569,7 @@ for i, idx in enumerate(np.random.choice(x_test.shape[0], size=16, replace=False
 plt.show()
 ```
 
-# _8_.py
+# _8_AI_driving.py
 
 ```py
 # OpenCV로부터 영상 받기
