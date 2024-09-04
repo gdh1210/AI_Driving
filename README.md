@@ -4,6 +4,7 @@
 
 <div align="center">
 <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
+<img src="https://img.shields.io/badge/-Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white">
 </div>
 
 # 자율 주행 프로젝트
@@ -20,6 +21,12 @@
 
 
 ---
+
+사용된 아두이노 차량 사진 프로젝트를 시행하기에 앞서 차량 조립을 진행하였다.
+<div align="center">
+<img src="https://github.com/user-attachments/assets/25e8f66b-24ce-4167-ad53-f2cd2da8d6be">
+</div>
+
 # _1_myjoystick.py
 
 ```py
