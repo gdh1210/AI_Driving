@@ -21,11 +21,70 @@
 
 
 ---
+### 06-19(수)
+
 
 사용된 아두이노 차량 사진 프로젝트를 시행하기에 앞서 차량 조립을 진행하였다.
+
 <div align="center">
 <img src="https://github.com/user-attachments/assets/25e8f66b-24ce-4167-ad53-f2cd2da8d6be">
 </div>
+
+
+조립이후 arduino_running_test.zip 안에있는 아두이노 소스 자료를 활용하여 연결된 각종 센서와 모터의 구동이 정상적으로 작동하는지 확인해 보고.
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/cd6e7f48-aad4-4f04-ae67-29131436b4f7" width="500" height="200">
+</div>
+
+확인 결과 결함이 있거나 동작하지 않는 센서는 없었다.<br>
+이후 모터 동작을 설정하기 위해 아두이노코딩을 진행했다.
+
+```c++
+#include "DCmotor.h"
+#include "rccar.h"
+//초음파 지정자
+const int trigPin = 8;
+const int echoPin = 13;
+long duration;
+int distance;
+//모터 지정자
+DCmotor dcF_L(2, 3);
+DCmotor dcF_R(4, 5);
+DCmotor dcB_L(7, 6);
+DCmotor dcB_R(19, 10);
+RCCar car(dcF_L, dcF_R, dcB_L, dcB_R);
+void setup() {
+  pinMode(trigPin, OUTPUT); 
+  pinMode(echoPin, INPUT); 
+  Serial.begin(9600);}
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance= duration*0.034/2;
+  Serial.println(distance);
+  if (distance<20) {
+    car.backward();
+    delay(2000);
+    car.stop(); }
+  if(Serial.available()>0) {
+    int cmd=Serial.read();
+    switch(cmd) {
+      case 'w': car.forward(); break;
+      case 's': car.backward(); break;
+      case 'a': car.left(); break;
+      case 'd': car.right(); break;
+      case 'x': car.stop(); break;
+      default: break; } } }
+```
+초음파 감지 센서로 거리를 측정하고 20 이하의 거리가 감지되면 뒤로 2초간 이동후 정지 하는 코드이다 또한 핸드폰과 블루투스 페어링을 통해 w 전진, s 후진, a 좌회전, d 우회전, x 정지를 시행 가능하다.<br>
+우선은 이렇게 짜여진 코드를 이용해 모의주행을 실시하여 학습시킬 데이터를 수집할 것이다.
+
+
 
 # _1_myjoystick.py
 
