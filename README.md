@@ -9,7 +9,7 @@
 # 자율 주행 프로젝트
 
 <p align="center">
-  <a href="https://github.com/user-attachments/assets/39d14945-4a3e-4fa9-ac88-ce991a6a1591O">비디오 보기</a>
+<img src="https://github.com/user-attachments/assets/09507add-d095-4659-83d7-c5c6b459c12e">
 </p>
 
 
@@ -19,3 +19,17 @@
 
 
 
+
+
+
+
+
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/18be9e08-471c-433c-91ca-a31047a138ab">
+</p>
+
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/e8a619d6-7eaf-49e3-89d1-45f7730c738f">
+</p>
