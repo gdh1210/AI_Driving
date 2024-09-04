@@ -225,6 +225,8 @@ class MyJoystickApp:
 <img src="https://github.com/user-attachments/assets/8aa03a29-f86e-4933-af04-787b4d349715" width="600" height="600">
 </div>
 
+프로그램 설치랑 핸드폰과 연결만 확인하고 나머지는 내일 작업을 진행하겠다.
+
 ---
 
 ### 06-21(금)
@@ -285,17 +287,14 @@ class MyJoystickCamApp(MyJoystickApp):
 ```
 
 카메라 연결을 cv2 모델의 camMain 함수에서 처리하고 이전의 조이스틱 파일을 불러와 결합시켜 동작을 한다.
+
 <div align="center">
-<img src="https://github.com/user-attachments/assets/881a3daf-52d2-4ad3-ba88-a9041c2b16b2" width="300" height="300">
-<img src="https://github.com/user-attachments/assets/2e98304c-1585-4adb-a140-d089b1d66caf" width="300" height="300">
-<img src="https://github.com/user-attachments/assets/9a9a4f91-7630-4793-b04f-4489dc6561df" width="100" height="150">
+<img src="https://github.com/user-attachments/assets/f43de05c-ce71-439d-840e-f1f20c599252" width="600" height="600">
+<img src="https://github.com/user-attachments/assets/ad3635fe-156b-48a9-8faa-bcd5e31e02ba" width="300" height="300">
 </div>
 
-![image](https://github.com/user-attachments/assets/f43de05c-ce71-439d-840e-f1f20c599252)
-![image](https://github.com/user-attachments/assets/ad3635fe-156b-48a9-8faa-bcd5e31e02ba)
-
-
-
+10분 정도 동작결과 카메라 프레임이 30대에서 안정화 되어있고 영상을 받고 출력하는데에 딜레이 발생이 없었다.<br>
+이제 연결된 카메라를 통해 받은 영상을 사진데이터로 수집하여 학습용으로 만드는 과정을 진행할 것이다.
 
 # _4_MyDataCollectionApp.py
 ```py
@@ -385,9 +384,11 @@ if __name__ == '__main__':
     myDataCollectionApp.run()
 ```
 
+시범주행 과정에서 마우스로 조이스틱을 움직이는데 조금 불편해서 키보드를 입력받아 움직이도록 코드를 수정했다.
+
 # _4-1_MyDataCollectionApp.py
 
-시범주행 과정에서 마우스로 조이스틱을 움직이는데 조금 불편해서 키보드를 입력받아 움직이도록 코드를 추가했다.
+커맨드를 입력받는 부분을 keyboard.is_pressed 를 통해 입력을 감지하고 명령을 시행한다.
 
 ```py
         if keyboard.is_pressed('w'):
@@ -419,12 +420,15 @@ if __name__ == '__main__':
     myDataCollectionApp = MyDataCollectionApp(cbJoyPos=cbJoyPos)
     myDataCollectionApp.run()
 ```
-![image](https://github.com/user-attachments/assets/070e0b4b-bb5f-466c-b77b-6de55a56540a)
 
-![image](https://github.com/user-attachments/assets/f73a92e5-14b5-446d-b3c1-7136c723f519)
+<div align="center">
+<img src="https://github.com/user-attachments/assets/070e0b4b-bb5f-466c-b77b-6de55a56540a" width="600" height="300">
+</div>
 
-![image](https://github.com/user-attachments/assets/26ed32cc-81c5-49e8-aa58-3246ddc2d111)
-
+<div align="center">
+<img src="https://github.com/user-attachments/assets/f73a92e5-14b5-446d-b3c1-7136c723f519" width="300" height="300">
+<img src="https://github.com/user-attachments/assets/26ed32cc-81c5-49e8-aa58-3246ddc2d111" width="300" height="300">
+</div>
 
 
 # _5_data_labelling.py
