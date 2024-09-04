@@ -408,6 +408,14 @@ if __name__ == '__main__':
     myDataCollectionApp = MyDataCollectionApp(cbJoyPos=cbJoyPos)
     myDataCollectionApp.run()
 ```
+![image](https://github.com/user-attachments/assets/070e0b4b-bb5f-466c-b77b-6de55a56540a)
+
+![image](https://github.com/user-attachments/assets/f73a92e5-14b5-446d-b3c1-7136c723f519)
+
+![image](https://github.com/user-attachments/assets/26ed32cc-81c5-49e8-aa58-3246ddc2d111)
+
+
+
 # _5_data_labelling.py
 ```py
 dataDir = 'data'  # 데이터 저장 디렉터리
@@ -432,6 +440,9 @@ for num, roadDir in enumerate(roadDirs):
 f_csv.flush()
 f_csv.close()
 ```
+![image](https://github.com/user-attachments/assets/7728c1a1-6ea6-4613-a5db-5ef9338ecf58)
+
+
 # _6_cnn_training.py
 ```py
 dirname = "data"
@@ -466,6 +477,9 @@ print(tensors.shape)
 print(targets.shape)
 ```
 
+![image](https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d)
+
+
 # _6-1_cnn_reading.py
 ```py
 # Name list
@@ -489,8 +503,90 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 plt.show()
 ```
+![image](https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531)
+
+
+
 # _7_tensorflow_training.py
 ```py
+from cnn_training import *
+from tensorflow.keras.utils import to_categorical
+from sklearn.model_selection import train_test_split
+
+import tensorflow as tf
+import matplotlib.pyplot as plt
+
+tensors = tensors.astype('float32') / 255
+targets = to_categorical(targets, 4)
+
+x_train, x_test, y_train, y_test = train_test_split(
+    tensors,
+    targets,
+    test_size=0.2,
+    random_state=1
+)
+
+n = int(len(x_test) / 2)
+x_valid, y_valid = x_test[:n], y_test[:n]
+x_test, y_test = x_test[n:], y_test[n:]
+
+print(x_train.shape, y_train.shape)
+print(x_test.shape, y_test.shape)
+print(x_valid.shape, y_valid.shape)
+model = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(24, (5, 5), strides=(2, 2), padding="same",
+                           activation='relu', input_shape=x_train.shape[1:]),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Conv2D(32, (5, 5), strides=(2, 2), padding="same", activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Conv2D(64, (5, 5), strides=(2, 2), padding="same", activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Conv2D(64, (3, 3), padding="same", activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(100, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(50, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(4, activation='softmax')
+])
+model.summary()
+
+model.compile(loss='categorical_crossentropy',
+              optimizer='adam', metrics=['accuracy'])
+
+history = model.fit(x_train, y_train, epochs=50,
+                    validation_data=(x_valid, y_valid))
+
+loss = history.history['loss']
+epochs = range(1, len(loss) + 1)
+
+plt.plot(epochs, loss, 'g', label='Training loss')
+plt.title('Training loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+model.save("model.h5")
+
+```
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
+
+</div>
+
+# _7-1_tensorflow_reading.py
+
+```py
+from tensorflow_training import *
+from tensorflow.keras.models import load_model
+import matplotlib.pyplot as plt
+
 model1 = load_model('model.h5')
 
 # Model predictions for the testing dataset
@@ -512,13 +608,9 @@ for i, idx in enumerate(np.random.choice(x_test.shape[0], size=16, replace=False
     ax.set_title("{} ({})".format(names[pred_idx], names[true_idx]),
                  color=("#4876ff" if pred_idx == true_idx else "darkred"))
 plt.show()
+
 ```
 
-<div align="center">
-<img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
-<img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
-
-</div>
 
 # _8_AI_driving.py
 
