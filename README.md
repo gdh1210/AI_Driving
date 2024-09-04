@@ -19,9 +19,579 @@
 
 
 
+---
+# _1_myjoystick.py
 
+```py
+class MyJoystick(QWidget):
+    def __init__(self, parent=None, cbJoyPos=None, app=None):
+        super(MyJoystick, self).__init__(parent)
+        self.setMinimumSize(200, 200)
+        self.movingOffset = QPointF(0, 0)  # 조이스틱 위치
+        self.grabCenter = False  # 조이스틱을 잡았느냐?
+        self.__maxDistance = 50  # 조이스틱 범위
+        self.cbJoyPos = cbJoyPos  # 사용자 정의 콜백 함수
+        self.app = app  # 앱 객체가 넘어옴, 뒤에서 정의함
+        
+        self.timer = QTimer(self)
+        self.timer.setInterval(50)
+        self.timer.timeout.connect(self.timeout)
+        self.timer.start()
 
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        bounds = QRectF(
+            -self.__maxDistance, 
+            -self.__maxDistance, 
+            self.__maxDistance * 2, 
+            self.__maxDistance * 2
+        ).translated(self._center())
+        painter.drawEllipse(bounds)
+        painter.setBrush(Qt.black)
+        painter.drawEllipse(self._centerEllipse())
 
+    def _center(self):
+        return QPointF(self.width() / 2, self.height() / 2)
+
+    def _centerEllipse(self):
+        if self.grabCenter:
+            return QRectF(-20, -20, 40, 40).translated(self.movingOffset)
+        return QRectF(-20, -20, 40, 40).translated(self._center())
+
+    def mousePressEvent(self, event):
+        self.grabCenter = self._centerEllipse().contains(event.pos())
+        self.movingOffset = self._boundJoystick(event.pos())
+        self.update()
+        return super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.grabCenter:
+            self.movingOffset = self._boundJoystick(event.pos())
+            self.update()
+        if self.cbJoyPos is not None:
+            self.cbJoyPos(self._joystickPosition(), self.app)
+
+    def _boundJoystick(self, point):
+        limitLine = QLineF(self._center(), point)
+        if limitLine.length() > self.__maxDistance:
+            limitLine.setLength(self.__maxDistance)
+        return limitLine.p2()
+
+    def mouseReleaseEvent(self, event):
+        self.grabCenter = False
+        self.movingOffset = QPointF(0, 0)
+        self.update()
+        if self.cbJoyPos is not None:
+            self.cbJoyPos(self._joystickPosition(), self.app)
+
+    def timeout(self):
+        sender = self.sender()
+        if id(sender) == id(self.timer):
+            if self.cbJoyPos is not None:
+                self.cbJoyPos(self._joystickPosition(), self.app)
+
+    def _joystickPosition(self):
+        if not self.grabCenter:
+            return (0, 0)
+        normVector = QLineF(self._center(), self.movingOffset)
+        currentDistance = normVector.length()
+        angle = normVector.angle()
+        distance = min(currentDistance / self.__maxDistance, 1.0)
+        posX = math.cos(angle * math.pi / 180) * distance
+        posY = math.sin(angle * math.pi / 180) * distance
+        return (posX, posY)
+```
+
+# _2_myjoystickapp.py
+```py
+class MyJoystickApp:
+    def __init__(self, cbJoyPos=None):
+        self.app = QApplication([])
+        self.mw = QMainWindow()
+        self.mw.setWindowTitle('RC Car Joystick')
+        self.mw.setGeometry(100, 100, 300, 200)
+        
+        cw = QWidget()
+        cw.setStyleSheet("background-color:gray;")
+        self.mw.setCentralWidget(cw)
+        
+        ml = QGridLayout()
+        cw.setLayout(ml)
+        
+        self.video = QLabel('Video here~')
+        ml.addWidget(self.video, 0, 0)
+        
+        self.joystick = MyJoystick(cbJoyPos=cbJoyPos, app=self)
+        ml.addWidget(self.joystick, 1, 0)
+        
+        self.speed = 33
+        speedbar = QSlider(Qt.Horizontal)
+        speedbar.setRange(0, 100)
+        speedbar.setTickInterval(10)
+        speedbar.setTickPosition(QSlider.TicksBelow)
+        speedbar.setValue(self.speed)
+        speedbar.valueChanged.connect(self.setSpeed)
+        ml.addWidget(speedbar, 2, 0)
+        
+        self.app.aboutToQuit.connect(self.app.deleteLater)
+        
+        self.mw.show()
+
+    def setSpeed(self, speed):
+        self.speed = speed
+
+    def getSpeed(self):
+        return self.speed
+
+    def run(self):
+        self.app.exec_()
+```
+# _3_.py
+```py
+class MyJoystickCamApp(MyJoystickApp):
+    def __init__(self, cbJoyPos=None):
+        super().__init__(cbJoyPos)
+
+        self.camThread = threading.Thread(target=self.camMain)
+        self.camThread.daemon = True
+        self.camThread.start()
+
+        self.app.aboutToQuit.connect(lambda: sys.exit(0))
+
+        self.t_prev = time.time()
+        self.cnt_frame = 0
+        self.total_frame = 0
+        self.cnt_time = 0
+
+    def camMain(self):
+        cap = cv2.VideoCapture(0)
+        width, height = 640, 480
+        self.video.resize(width, height)
+
+        while True:
+            # 영상 받기
+            ret, frame = cap.read()
+            if not ret:
+                print("Error: Failed to capture image.")
+                break
+
+            # 영상 출력
+            frame2 = cv2.resize(frame, (640, 480))
+
+            h, w, c = frame2.shape
+            qImg = QtGui.QImage(frame2.data, w, h, w * c, QtGui.QImage.Format_RGB888)
+            pixmap = QtGui.QPixmap.fromImage(qImg.rgbSwapped())
+            self.video.setPixmap(pixmap)
+
+            self.collectData(frame)
+            self.checkFrameRate()
+
+    def collectData(self, frame):
+        # 데이터 수집 로직을 여기에 구현
+        pass
+
+    def checkFrameRate(self):
+        self.cnt_frame += 1
+        t_now = time.time()
+        if t_now - self.t_prev >= 1.0:
+            self.t_prev = t_now
+            self.total_frame += self.cnt_frame
+            self.cnt_time += 1
+            print("FPS: %d, avg: %.2f" % (self.cnt_frame, self.total_frame / self.cnt_time))
+            self.cnt_frame = 0
+```
+# _4_.py
+```py
+class MyDataCollectionApp(MyJoystickCamApp):
+    def __init__(self, cbJoyPos=None):
+        super().__init__(cbJoyPos)
+        
+        self.rl = 0
+        self.cnt_frame_total = 0
+        
+        self.datadir = 'data_%f' % (time.time())
+        os.mkdir(self.datadir)
+        os.mkdir(os.path.join(self.datadir, '_0_forward'))
+        os.mkdir(os.path.join(self.datadir, '_1_right'))
+        os.mkdir(os.path.join(self.datadir, '_2_left'))
+        os.mkdir(os.path.join(self.datadir, '_3_stop'))
+        
+        self.names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
+
+    def setRL(self, rl):
+        self.rl = rl
+
+    def collectData(self, frame):
+        rl = self.rl
+        collect_data = (rl & 4) >> 2
+        if collect_data == 1:
+            rl = rl & 3
+            frame = cv2.resize(frame, (160, 120))
+            road_file = '%f.png' % (time.time())
+            cv2.imwrite(os.path.join(os.path.join(self.datadir, self.names[rl]), road_file), frame)
+            self.cnt_frame_total += 1
+
+    def checkFrameRate(self):
+        self.cnt_frame += 1
+        t_now = time.time()
+        if t_now - self.t_prev >= 1.0:
+            self.t_prev = t_now
+            print("frame count : %d" % self.cnt_frame, "total frame : %d" % self.cnt_frame_total)
+            self.cnt_frame = 0
+
+if __name__ == '__main__':
+    import serial
+    
+    mot_serial = serial.Serial('COM9', 9600)
+    
+    def cbJoyPos(joystickPosition, app=None):
+        posX, posY = joystickPosition
+        
+        speed = 0
+        if app is not None:
+            speed = app.getSpeed()
+        
+        command = 'x'
+        collect_data = 1
+        
+        if posY < -0.5:
+            command = 's'  # backward
+            collect_data = 0
+        elif posY > 0.15:
+            if -0.15 <= posX <= 0.15:
+                command = 'w'  # forward
+            elif posX < -0.15:
+                command = 'a'  # left
+            elif posX > 0.15:
+                command = 'd'  # right
+            else:
+                command = 'x'  # stop driving
+                collect_data = 0
+        
+        if command == 'w':
+            right, left = 0, 0  # forward
+        elif command == 'a':
+            right, left = 1, 0  # left
+        elif command == 'd':
+            right, left = 0, 1  # right
+        elif command == 'x':
+            right, left = 1, 1  # stop
+        else:
+            right, left = 1, 1  # stop
+        
+        rl = collect_data << 2 | right << 1 | left
+        myDataCollectionApp.setRL(rl)
+        
+        mot_serial.write(command.encode())
+    
+    myDataCollectionApp = MyDataCollectionApp(cbJoyPos=cbJoyPos)
+    myDataCollectionApp.run()
+```
+
+# _4-1_.py
+```py
+class MyDataCollectionApp(MyJoystickCamApp):
+    def __init__(self, cbJoyPos=None):
+        super().__init__(cbJoyPos)
+        
+        self.rl = 0
+        self.cnt_frame_total = 0
+        
+        self.datadir = 'data_%f' % (time.time())
+        os.mkdir(self.datadir)
+        os.mkdir(os.path.join(self.datadir, '_0_forward'))
+        os.mkdir(os.path.join(self.datadir, '_1_right'))
+        os.mkdir(os.path.join(self.datadir, '_2_left'))
+        os.mkdir(os.path.join(self.datadir, '_3_stop'))
+        
+        self.names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
+
+    def setRL(self, rl):
+        self.rl = rl
+
+    def collectData(self, frame):
+        rl = self.rl
+        collect_data = (rl & 4) >> 2
+        if collect_data == 1:
+            rl = rl & 3
+            frame = cv2.resize(frame, (160, 120))
+            road_file = '%f.png' % (time.time())
+            cv2.imwrite(os.path.join(os.path.join(self.datadir, self.names[rl]), road_file), frame)
+            self.cnt_frame_total += 1
+
+    def checkFrameRate(self):
+        self.cnt_frame += 1
+        t_now = time.time()
+        if t_now - self.t_prev >= 1.0:
+            self.t_prev = t_now
+            print("frame count : %d" % self.cnt_frame, "total frame : %d" % self.cnt_frame_total)
+            self.cnt_frame = 0
+
+if __name__ == '__main__':
+    import serial
+    
+    mot_serial = serial.Serial('COM9', 9600)
+    
+    def cbJoyPos(joystickPosition, app=None):
+        posX, posY = joystickPosition
+        
+        speed = 0
+        if app is not None:
+            speed = app.getSpeed()
+        
+        command = 'x'
+        collect_data = 1
+        
+        if posY < -0.5:
+            command = 's'  # backward
+            collect_data = 0
+        elif posY > 0.15:
+            if -0.15 <= posX <= 0.15:
+                command = 'w'  # forward
+            elif posX < -0.15:
+                command = 'a'  # left
+            elif posX > 0.15:
+                command = 'd'  # right
+            else:
+                command = 'x'  # stop driving
+                collect_data = 0
+        
+        if keyboard.is_pressed('w'):
+            command = 'w'
+        elif keyboard.is_pressed('a'):
+            command = 'a'
+        elif keyboard.is_pressed('d'):
+            command = 'd'
+        elif keyboard.is_pressed('s'):
+            command = 's'
+            
+        if command == 'w':
+            right, left = 0, 0  # forward
+        elif command == 'a':
+            right, left = 1, 0  # left
+        elif command == 'd':
+            right, left = 0, 1  # right
+        elif command == 'x':
+            right, left = 1, 1  # stop
+        else:
+            right, left = 1, 1  # stop
+        
+        
+        rl = collect_data << 2 | right << 1 | left
+        myDataCollectionApp.setRL(rl)
+        
+        mot_serial.write(command.encode())
+    
+    myDataCollectionApp = MyDataCollectionApp(cbJoyPos=cbJoyPos)
+    myDataCollectionApp.run()
+```
+# _5_.py
+```py
+dataDir = 'data'  # 데이터 저장 디렉터리
+
+print(os.getcwd())  # 현재 디렉터리 어딘지 확인
+os.chdir(dataDir)  # 디렉터리 이동
+roadDirs = os.listdir()  # 현재 디렉터리 확인
+print(roadDirs)
+
+f_csv = open('0_road_labels.csv', 'w', newline='')
+wr = csv.writer(f_csv)
+wr.writerow(["file", "label", "labelNames"])
+
+roadDirs = [road for road in roadDirs if os.path.isdir(road)]
+print(roadDirs)
+
+for num, roadDir in enumerate(roadDirs):
+    roadFiles = os.listdir(roadDir)
+    for roadFile in roadFiles:
+        wr.writerow([os.path.join(roadDir, roadFile), num, roadDir])
+
+f_csv.flush()
+f_csv.close()
+```
+# _6_.py
+```py
+dirname = "data"
+
+def image_to_tensor(img_path):
+    img = keras_image.load_img(
+        os.path.join(dirname, img_path),
+        target_size=(120, 160)
+    )
+    x = keras_image.img_to_array(img)
+    return np.expand_dims(x, axis=0)
+
+def data_to_tensor(img_paths):
+    list_of_tensors = [
+        image_to_tensor(img_path) for img_path in tqdm(img_paths)
+    ]
+    return np.vstack(list_of_tensors)
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+# Load the data
+data = pd.read_csv(os.path.join(dirname, "0_road_labels.csv"))
+data = data.sample(frac=1)
+
+files = data['file']
+targets = data['label'].values
+
+tensors = data_to_tensor(files)
+
+print(data.tail())
+print(tensors.shape)
+print(targets.shape)
+```
+
+# _6-1_.py
+```py
+# Name list
+names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
+
+def display_images(img_path, ax):
+    img = cv2.imread(os.path.join(dirname, img_path))
+    ax.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+fig, axes = plt.subplots(3, 3, figsize=(15, 10))
+
+for i, ax in enumerate(axes.flat):
+    if i < len(files):
+        ax.set_title(names[targets[i]], color='blue')
+        display_images(files[i], ax)
+    else:
+        ax.axis('off')  # 이미지가 없으면 서브플롯을 비활성화
+
+plt.tight_layout()
+plt.show()
+```
+# _7_.py
+```py
+model1 = load_model('model.h5')
+
+# Model predictions for the testing dataset
+y_test_predict = model1.predict(x_test)
+print(y_test_predict.shape, y_test_predict[0])
+y_test_predict = np.argmax(y_test_predict, axis=1)
+print(y_test_predict.shape, y_test_predict[0])
+
+# Name list
+names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
+
+# Display true labels and predictions
+fig = plt.figure(figsize=(18, 18))
+for i, idx in enumerate(np.random.choice(x_test.shape[0], size=16, replace=False)):
+    ax = fig.add_subplot(4, 4, i + 1, xticks=[], yticks=[])
+    ax.imshow(np.squeeze(x_test[idx]))
+    pred_idx = y_test_predict[idx]
+    true_idx = np.argmax(y_test[idx])
+    ax.set_title("{} ({})".format(names[pred_idx], names[true_idx]),
+                 color=("#4876ff" if pred_idx == true_idx else "darkred"))
+plt.show()
+```
+
+# _8_.py
+
+```py
+# OpenCV로부터 영상 받기
+cap = cv2.VideoCapture(0)
+
+# 시리얼 통신 설정
+mot_serial = serial.Serial('COM9', 9600)
+
+# 모델 로드
+model = load_model('model.h5')
+
+t_now = time.time()
+t_prev = time.time()
+cnt_frame = 0
+
+# 클래스/라벨 이름 설정
+names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
+
+# 메시지 큐 설정
+HOW_MANY_MESSAGES = 10
+mq = queue.Queue(HOW_MANY_MESSAGES)
+
+# CNN 메인 함수 정의
+def cnn_main(args):
+    while True:
+        frame = mq.get()
+        frame_thrown = 0
+        while not mq.empty():
+            frame = mq.get()
+            frame_thrown += 1
+            
+        print(f'{frame_thrown} frame thrown')
+
+        # 전처리: 이미지 스케일링
+        image = frame
+        image = frame / 255.0
+
+        # 이미지 텐서로 변환
+        image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
+        image_tensor = tf.expand_dims(image_tensor, 0)
+
+        # 예측
+        y_predict = model.predict(image_tensor)
+        y_predict = np.argmax(y_predict, axis=1)
+        print(names[y_predict[0]], y_predict[0])
+
+        # 예측 결과에 따른 명령 전송
+        cmd = y_predict[0].item()
+        if cmd == 0:
+            command = 'w'
+        elif cmd == 1:
+            command = 'd'
+        elif cmd == 2:
+            command = 'a'
+        else:
+            command = 'x'
+        mot_serial.write(command.encode())
+
+# CNN 메인 쓰레드 실행
+cnnThread = threading.Thread(target=cnn_main, args=(0,))
+cnnThread.daemon = True
+cnnThread.start()
+
+# 메인 루프: 영상 받기 및 처리
+while True:
+    # 영상 받기
+    ret, frame = cap.read()
+
+    # 영상 출력
+    frame = cv2.resize(frame, (640, 480))
+    cv2.imshow('frame', frame)
+
+    # 프레임 크기 축소 후 메시지 큐에 추가
+    frame = cv2.resize(frame, (160, 120))
+    mq.put(frame)
+
+    # 키 입력 확인 (ESC 키 입력 시 종료)
+    key = cv2.waitKey(1)
+    if key == 27:
+        break
+
+    # 프레임 수 카운트
+    cnt_frame += 1
+    t_now = time.time()
+
+    # 1초마다 프레임 수 출력
+    if t_now - t_prev >= 1.0:
+        t_prev = t_now
+        print("frame count : %f" % cnt_frame)
+        cnt_frame = 0
+
+# 종료 처리
+mot_serial.write('s'.encode())
+mot_serial.close()
+cap.release()
+cv2.destroyAllWindows()
+sys.exit(0)
+```
+
+---
 
 
 
