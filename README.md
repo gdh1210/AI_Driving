@@ -420,16 +420,18 @@ if __name__ == '__main__':
     myDataCollectionApp = MyDataCollectionApp(cbJoyPos=cbJoyPos)
     myDataCollectionApp.run()
 ```
+데이터 수집을위한 모의 주행이후 폴더가 생성된 것을 확인할 수 있었고
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/070e0b4b-bb5f-466c-b77b-6de55a56540a" width="600" height="300">
+<img src="https://github.com/user-attachments/assets/070e0b4b-bb5f-466c-b77b-6de55a56540a" width="600" height="100">
 </div>
+
+_0_forward 폴더(좌)내부와 _2_left 폴더(우)내부의 수집된 데이터의 모습 또한 확인이 가능하다.
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/f73a92e5-14b5-446d-b3c1-7136c723f519" width="300" height="300">
 <img src="https://github.com/user-attachments/assets/26ed32cc-81c5-49e8-aa58-3246ddc2d111" width="300" height="300">
 </div>
-
 
 # _5_data_labelling.py
 ```py
@@ -455,8 +457,11 @@ for num, roadDir in enumerate(roadDirs):
 f_csv.flush()
 f_csv.close()
 ```
-![image](https://github.com/user-attachments/assets/7728c1a1-6ea6-4613-a5db-5ef9338ecf58)
+학습데이터로 사용하기 위해 각 폴더의 사진에 라벨링 작업을 해주어
 
+<div align="center">
+<img src="https://github.com/user-attachments/assets/7728c1a1-6ea6-4613-a5db-5ef9338ecf58" width="600" height="100">
+</div>
 
 # _6_cnn_training.py
 ```py
@@ -492,7 +497,9 @@ print(tensors.shape)
 print(targets.shape)
 ```
 
-![image](https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d)
+<div align="center">
+<img src="https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d" width="600" height="100">
+</div>
 
 
 # _6-1_cnn_reading.py
@@ -518,8 +525,10 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 plt.show()
 ```
-![image](https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531)
 
+<div align="center">
+<img src="https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531" width="600" height="100">
+</div>
 
 
 # _7_tensorflow_training.py
