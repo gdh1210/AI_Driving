@@ -79,9 +79,9 @@ void loop() {
       case 'x': car.stop(); break;
       default: break; } } }
 ```
+
 초음파 감지 센서로 거리를 측정하고 20 이하의 거리가 감지되면 뒤로 2초간 이동후 정지 하는 코드이다 또한 핸드폰과 블루투스 페어링을 통해 w 전진, s 후진, a 좌회전, d 우회전, x 정지를 시행 가능하다.<br>
 우선은 이렇게 짜여진 코드를 이용해 모의주행을 실시하여 학습시킬 데이터를 수집할 것이다.
-
 
 ### 06.20(목)
 # _1_myjoystick.py
@@ -165,10 +165,13 @@ class MyJoystick(QWidget):
         posY = math.sin(angle * math.pi / 180) * distance
         return (posX, posY)
 ```
+우선 조이스틱 부분을 작성하고 실행해 보았다. 가동범위가 원안으로 제한되어있는지 앞,뒤 양옆 이동간에 좌표값을 제대로 송신 받는지 확인 했다.
 
-![image](https://github.com/user-attachments/assets/881a3daf-52d2-4ad3-ba88-a9041c2b16b2)
-
-![image](https://github.com/user-attachments/assets/2e98304c-1585-4adb-a140-d089b1d66caf)
+<div align="center">
+<img src="https://github.com/user-attachments/assets/881a3daf-52d2-4ad3-ba88-a9041c2b16b2" width="300" height="300">
+<img src="https://github.com/user-attachments/assets/2e98304c-1585-4adb-a140-d089b1d66caf" width="300" height="300">
+<img src="https://github.com/user-attachments/assets/9a9a4f91-7630-4793-b04f-4489dc6561df" width="100" height="150">
+</div>
 
 # _2_myjoystickapp.py
 ```py
@@ -214,15 +217,13 @@ class MyJoystickApp:
     def run(self):
         self.app.exec_()
 ```
-여기까지 작성후 실행 시킨 모습이다.
 
-
+배경색이 너무 진한거 같아 변경하였고 창의 크기 또한 좀더 크게 늘려주었다.<br>
+위쪽에 위젯을 넣어 카메라를 연결하려고 블루투스 무선 통신을 위해 외부 프로그램인 Camo Studio를 사용했다.
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/8aa03a29-f86e-4933-af04-787b4d349715" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/8aa03a29-f86e-4933-af04-787b4d349715" width="600" height="600">
 </div>
-
-카메라 연결을cv2 모델의 camMain 함수에서 처리하고 이전의 조이스틱 파일을 불러와 결합시켜 동작을 한다.
 
 ---
 
@@ -282,8 +283,18 @@ class MyJoystickCamApp(MyJoystickApp):
             print("FPS: %d, avg: %.2f" % (self.cnt_frame, self.total_frame / self.cnt_time))
             self.cnt_frame = 0
 ```
+
+카메라 연결을 cv2 모델의 camMain 함수에서 처리하고 이전의 조이스틱 파일을 불러와 결합시켜 동작을 한다.
+<div align="center">
+<img src="https://github.com/user-attachments/assets/881a3daf-52d2-4ad3-ba88-a9041c2b16b2" width="300" height="300">
+<img src="https://github.com/user-attachments/assets/2e98304c-1585-4adb-a140-d089b1d66caf" width="300" height="300">
+<img src="https://github.com/user-attachments/assets/9a9a4f91-7630-4793-b04f-4489dc6561df" width="100" height="150">
+</div>
+
 ![image](https://github.com/user-attachments/assets/f43de05c-ce71-439d-840e-f1f20c599252)
 ![image](https://github.com/user-attachments/assets/ad3635fe-156b-48a9-8faa-bcd5e31e02ba)
+
+
 
 
 # _4_MyDataCollectionApp.py
