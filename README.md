@@ -498,7 +498,7 @@ print(targets.shape)
 ```
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d" width="600" height="100">
+<img src="https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d" width="1000" height="300">
 </div>
 
 
@@ -527,7 +527,7 @@ plt.show()
 ```
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531" width="600" height="100">
+<img src="https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531" width="600" height="600">
 </div>
 
 
@@ -599,9 +599,7 @@ model.save("model.h5")
 ```
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
 <img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
-
 </div>
 
 # _7-1_tensorflow_reading.py
@@ -634,7 +632,9 @@ for i, idx in enumerate(np.random.choice(x_test.shape[0], size=16, replace=False
 plt.show()
 
 ```
-
+<div align="center">
+<img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
+</div>
 
 # _8_AI_driving.py
 
@@ -736,13 +736,12 @@ cv2.destroyAllWindows()
 sys.exit(0)
 ```
 
----
-
-
-
 <p align="center">
 <img src="https://github.com/user-attachments/assets/18be9e08-471c-433c-91ca-a31047a138ab">
 </p>
+
+---
+
 
 
 <p align="center">
