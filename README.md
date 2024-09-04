@@ -457,7 +457,7 @@ for num, roadDir in enumerate(roadDirs):
 f_csv.flush()
 f_csv.close()
 ```
-학습데이터로 사용하기 위해 각 폴더의 사진에 라벨링 작업을 해주어
+학습데이터로 사용하기 위해 각 폴더의 사진에 라벨링 작업을 해주었다.
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/7728c1a1-6ea6-4613-a5db-5ef9338ecf58" width="600" height="100">
@@ -496,6 +496,7 @@ print(data.tail())
 print(tensors.shape)
 print(targets.shape)
 ```
+cnn 신경망을 이용해 학습 진행중...
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d" width="1000" height="300">
@@ -525,11 +526,14 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 plt.show()
 ```
+학습한 결과 9개의 사진을 테스트 해보았을때 우측 중앙과 하단이 전진을 해야하는 사진임에도 불구하고 오른쪽으로 가는 오류를 발생시키고 있다.
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531" width="600" height="600">
 </div>
 
+대략 적중률이 70% ~ 80% 정도를 보이며 높아보이지만 사실 자율주행을 하면 30프레임(0.5초)에 한번 씩 판단을 내려 주행을 해야하는데<br>
+30초만 주행해도 60번의 판단을 내려야 하며 75%의 정답률로 계산시 15번이 오판된 명령이 내려진다 이는 경로에서 크게 이탈할 가능성이 크다.
 
 # _7_tensorflow_training.py
 ```py
@@ -736,13 +740,10 @@ cv2.destroyAllWindows()
 sys.exit(0)
 ```
 
+
 <p align="center">
 <img src="https://github.com/user-attachments/assets/18be9e08-471c-433c-91ca-a31047a138ab">
 </p>
-
----
-
-
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/e8a619d6-7eaf-49e3-89d1-45f7730c738f">
