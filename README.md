@@ -166,6 +166,10 @@ class MyJoystick(QWidget):
         return (posX, posY)
 ```
 
+![image](https://github.com/user-attachments/assets/881a3daf-52d2-4ad3-ba88-a9041c2b16b2)
+
+![image](https://github.com/user-attachments/assets/2e98304c-1585-4adb-a140-d089b1d66caf)
+
 # _2_myjoystickapp.py
 ```py
 class MyJoystickApp:
@@ -212,8 +216,10 @@ class MyJoystickApp:
 ```
 여기까지 작성후 실행 시킨 모습이다.
 
+
+
 <div align="center">
-<img src="https://github.com/user-attachments/assets/a86f6513-3fb6-4f63-aa13-46f43c5b4fca" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/8aa03a29-f86e-4933-af04-787b4d349715" width="400" height="400">
 </div>
 
 카메라 연결을cv2 모델의 camMain 함수에서 처리하고 이전의 조이스틱 파일을 불러와 결합시켜 동작을 한다.
@@ -276,6 +282,10 @@ class MyJoystickCamApp(MyJoystickApp):
             print("FPS: %d, avg: %.2f" % (self.cnt_frame, self.total_frame / self.cnt_time))
             self.cnt_frame = 0
 ```
+![image](https://github.com/user-attachments/assets/f43de05c-ce71-439d-840e-f1f20c599252)
+![image](https://github.com/user-attachments/assets/ad3635fe-156b-48a9-8faa-bcd5e31e02ba)
+
+
 # _4_MyDataCollectionApp.py
 ```py
 class MyDataCollectionApp(MyJoystickCamApp):
@@ -365,73 +375,10 @@ if __name__ == '__main__':
 ```
 
 # _4-1_MyDataCollectionApp.py
+
+시범주행 과정에서 마우스로 조이스틱을 움직이는데 조금 불편해서 키보드를 입력받아 움직이도록 코드를 추가했다.
+
 ```py
-class MyDataCollectionApp(MyJoystickCamApp):
-    def __init__(self, cbJoyPos=None):
-        super().__init__(cbJoyPos)
-        
-        self.rl = 0
-        self.cnt_frame_total = 0
-        
-        self.datadir = 'data_%f' % (time.time())
-        os.mkdir(self.datadir)
-        os.mkdir(os.path.join(self.datadir, '_0_forward'))
-        os.mkdir(os.path.join(self.datadir, '_1_right'))
-        os.mkdir(os.path.join(self.datadir, '_2_left'))
-        os.mkdir(os.path.join(self.datadir, '_3_stop'))
-        
-        self.names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
-
-    def setRL(self, rl):
-        self.rl = rl
-
-    def collectData(self, frame):
-        rl = self.rl
-        collect_data = (rl & 4) >> 2
-        if collect_data == 1:
-            rl = rl & 3
-            frame = cv2.resize(frame, (160, 120))
-            road_file = '%f.png' % (time.time())
-            cv2.imwrite(os.path.join(os.path.join(self.datadir, self.names[rl]), road_file), frame)
-            self.cnt_frame_total += 1
-
-    def checkFrameRate(self):
-        self.cnt_frame += 1
-        t_now = time.time()
-        if t_now - self.t_prev >= 1.0:
-            self.t_prev = t_now
-            print("frame count : %d" % self.cnt_frame, "total frame : %d" % self.cnt_frame_total)
-            self.cnt_frame = 0
-
-if __name__ == '__main__':
-    import serial
-    
-    mot_serial = serial.Serial('COM9', 9600)
-    
-    def cbJoyPos(joystickPosition, app=None):
-        posX, posY = joystickPosition
-        
-        speed = 0
-        if app is not None:
-            speed = app.getSpeed()
-        
-        command = 'x'
-        collect_data = 1
-        
-        if posY < -0.5:
-            command = 's'  # backward
-            collect_data = 0
-        elif posY > 0.15:
-            if -0.15 <= posX <= 0.15:
-                command = 'w'  # forward
-            elif posX < -0.15:
-                command = 'a'  # left
-            elif posX > 0.15:
-                command = 'd'  # right
-            else:
-                command = 'x'  # stop driving
-                collect_data = 0
-        
         if keyboard.is_pressed('w'):
             command = 'w'
         elif keyboard.is_pressed('a'):
