@@ -13,8 +13,6 @@
 <img src="https://github.com/user-attachments/assets/09507add-d095-4659-83d7-c5c6b459c12e">
 </p>
 
-
-
 ## 목차
 * [06-19](#0619수)
 * [06-20](#0620목)
