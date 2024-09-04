@@ -569,6 +569,12 @@ for i, idx in enumerate(np.random.choice(x_test.shape[0], size=16, replace=False
 plt.show()
 ```
 
+<div align="center">
+<img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
+
+</div>
+
 # _8_AI_driving.py
 
 ```py
