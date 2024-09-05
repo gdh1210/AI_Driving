@@ -38,6 +38,8 @@
 확인 결과 결함이 있거나 동작하지 않는 센서는 없었다.<br>
 이후 모터 동작을 설정하기 위해 아두이노코딩을 진행했다.
 
+# AI_Driving_arduino.ino
+
 ```c++
 #include "DCmotor.h"
 #include "rccar.h"
@@ -496,14 +498,16 @@ print(data.tail())
 print(tensors.shape)
 print(targets.shape)
 ```
-cnn 신경망을 이용해 학습 진행중...
+이미지 데이터를 처리하여 학습에 사용할 수 있는 형태로 변환하고, 데이터를 랜덤하게 섞어서 모델이 편향되지 않도록 만들었다.
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d" width="1000" height="300">
 </div>
 
-
 # _6-1_cnn_reading.py
+
+데이터를 로드한 후 출력하는 작업을 진행하여 검수작업을 진행한다.
+
 ```py
 # Name list
 names = ['_0_forward', '_1_right', '_2_left', '_3_stop']
@@ -526,14 +530,14 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 plt.show()
 ```
-학습한 결과 9개의 사진을 테스트 해보았을때 우측 중앙과 하단이 전진을 해야하는 사진임에도 불구하고 오른쪽으로 가는 오류를 발생시키고 있다.
+데이터의 랜덤화 결과 9개의 사진을 테스트 해보았을때 우측 중앙과 하단이 전진을 해야하는 지 우회전을 해야하는지 애매하고<br>
+모의 주행시 수집한 데이터의 대부분이 전진이다 보니 
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531" width="600" height="600">
 </div>
 
-대략 적중률이 70% ~ 80% 정도를 보이며 높아보이지만 사실 자율주행을 하면 30프레임(0.5초)에 한번 씩 판단을 내려 주행을 해야하는데<br>
-30초만 주행해도 60번의 판단을 내려야 하며 75%의 정답률로 계산시 15번이 오판된 명령이 내려진다 이는 경로에서 크게 이탈할 가능성이 크다.
+
 
 # _7_tensorflow_training.py
 ```py
@@ -602,9 +606,18 @@ model.save("model.h5")
 
 ```
 
+
+
+
+대략 적중률이 70% ~ 80% 정도를 보이며 높아보이지만 사실 자율주행을 하면 30프레임(0.5초)에 한번 씩 판단을 내려 주행을 해야하는데<br>
+30초만 주행해도 60번의 판단을 내려야 하며 75%의 정답률로 계산시 15번이 오판된 명령이 내려진다 이는 경로에서 크게 이탈할 가능성이 크다.
+
 <div align="center">
 <img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
 </div>
+
+
+
 
 # _7-1_tensorflow_reading.py
 
