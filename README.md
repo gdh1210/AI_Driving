@@ -530,17 +530,18 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 plt.show()
 ```
+
 데이터의 랜덤화 결과 9개의 사진을 테스트 해보았을때 우측 중앙과 하단이 전진을 해야하는 지 우회전을 해야하는지 애매하고<br>
 모의 주행시 수집한 데이터의 대부분이 전진이다 보니 데이터의 랜덤화를 진행했음에도 전진이 대부분인건 어쩔 수 없는것 같다.
 > 전진 데이터 2,085 장, 우회전 데이터 685 장, 좌회전 데이터 492장
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/28829a5a-a73d-4a43-a721-1839a4949531" width="600" height="600">
-</div>
-
-
+</div> 
 
 # _7_tensorflow_training.py
+정규화된 데이터를 바탕으로 학습을 진행 하였다.
+
 ```py
 from cnn_training import *
 from tensorflow.keras.utils import to_categorical
@@ -606,6 +607,9 @@ plt.show()
 model.save("model.h5")
 
 ```
+<div align="center">
+<img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
+</div>
 
 
 
@@ -650,6 +654,7 @@ for i, idx in enumerate(np.random.choice(x_test.shape[0], size=16, replace=False
 plt.show()
 
 ```
+
 <div align="center">
 <img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
 </div>
