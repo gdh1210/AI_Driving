@@ -504,6 +504,9 @@ print(targets.shape)
 <img src="https://github.com/user-attachments/assets/8a1c2eb2-f46c-476e-aa5e-ab62d404312d" width="1000" height="300">
 </div>
 
+---
+### 06.24(월)
+
 # _6-1_cnn_reading.py
 
 데이터를 로드한 후 출력하는 작업을 진행하여 검수작업을 진행한다.
@@ -607,24 +610,24 @@ plt.show()
 model.save("model.h5")
 
 ```
+다층 신경망 구조는 ANN 구조를 참고해 만들었고 처음 학습을 진행할때 빠른 학습을 위해 Flatten 을 기준으로 위아래 층을 하나씩 빼고 학습 횟수도 5번정도로 진행을 했었다 <br>
+대략 적중률이 70% ~ 80% 정도를 보이고 높아보이지만 사실 자율주행을 하면 30프레임(0.5초)에 한번 씩 판단을 내려 주행을 해야하는데<br>
+30초만 주행해도 60번의 판단을 내려야 하며 75%의 정답률로 계산시 15번이 오판된 명령이 내려진다 이는 경로에서 이탈할 가능성이 크다.
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/de480a43-d259-4a39-b73c-09e6ce4d8b73" width="600" height="300">
+</div>
+
+학습횟수를 50회로 늘리고 학습간의 신경층을 조금더 늘렸다 결과적으로 적중률을 95% 이상으로 끌어올리는데 성공했다.
+
 <div align="center">
 <img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
 </div>
-
-
-
-
-대략 적중률이 70% ~ 80% 정도를 보이며 높아보이지만 사실 자율주행을 하면 30프레임(0.5초)에 한번 씩 판단을 내려 주행을 해야하는데<br>
-30초만 주행해도 60번의 판단을 내려야 하며 75%의 정답률로 계산시 15번이 오판된 명령이 내려진다 이는 경로에서 크게 이탈할 가능성이 크다.
-
-<div align="center">
-<img src="https://github.com/user-attachments/assets/7d2e8f1f-1de3-4195-aa39-be3f48bd855c" width="600" height="300">
-</div>
-
-
 
 
 # _7-1_tensorflow_reading.py
+
+학습이 끝난 모델을 검수 하기위해 그림을 하나하나 살펴보며 검수를 하기에는 너무 많은 작업이 필요하므로 대체 시각자료인 그래프로 변경하였다.  
 
 ```py
 from tensorflow_training import *
@@ -655,11 +658,18 @@ plt.show()
 
 ```
 
+그래프 확인결과 학습효과가 눈에 보이는 수준으로 좋다가 점점 0에 수렴하는 수평이 되는데 더 학습량을 늘리거나 신경망을 두텁게 한다해도 유의미한 정확도의 증가는 없을듯 하다.
+
 <div align="center">
 <img src="https://github.com/user-attachments/assets/2d816a96-d80f-4003-a011-08c7fb62a3d8" width="400" height="400">
 </div>
 
+---
+### 06.25(화)
+
 # _8_AI_driving.py
+
+학습이 끝난 model.h5를 가지고 자율 주행을 하기위한 코드작성을 진행하였다.
 
 ```py
 # OpenCV로부터 영상 받기
@@ -759,11 +769,16 @@ cv2.destroyAllWindows()
 sys.exit(0)
 ```
 
+주행결과 자율주행이 되는 모습을 확인할 수 있다.
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/18be9e08-471c-433c-91ca-a31047a138ab">
 </p>
 
+라인을 두 줄로 변경하고 재학습 하여 진행 결과 잘 가다가 경로를 이탈해 버렸다.
+
 <p align="center">
 <img src="https://github.com/user-attachments/assets/e8a619d6-7eaf-49e3-89d1-45f7730c738f">
 </p>
+
+시행착오 및 문제점
